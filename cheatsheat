@@ -1,0 +1,23 @@
+VBO (Vertex Buffer Object): 
+Stores vertex data in the GPU.
+
+VAO (Vertex Array Object): 
+Stores the configuration of vertex attribute pointers, managing which VBOs and EBOs are used and how.
+
+EBO (Element Buffer Object): 
+Stores indices that define the order of vertex rendering, allowing reuse of vertex data.
+
+
+uniform (variable modifier):
+Allows for "communicating", and transfering variables between shaders and CPU code
+
+	// Retrieve the location of the "scale" uniform variable in the shader program.
+	// This location is used to set or query the value of the uniform in the shader.
+	GLuint UniID = glGetUniformLocation(shaderProgram._ID, "scale");
+
+
+    shaderProgram.Activate();
+	// Set the value of the "scale" uniform variable in the shader program 
+	// This updates the shader with the new scale factor for rendering.
+    // has to be done after activating the program
+	glUniform1f(UniID, scale);

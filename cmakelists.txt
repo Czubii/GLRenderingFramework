@@ -1,0 +1,50 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(VoxelRaymarcher)
+
+# Ensure compile_commands.json is generated
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Add GLFW
+add_subdirectory(external/GLFW)
+include_directories(external/GLFW/include)
+
+# Add GLAD
+include_directories(external/glad/include)
+add_library(glad external/glad/src/glad.c)
+
+# Include directories for your headers
+include_directories(include)
+
+# Define the executable
+file(GLOB SOURCES src/*.cpp)
+add_executable(VoxelRaymarcher ${SOURCES})
+
+# Link libraries
+target_link_libraries(VoxelRaymarcher glfw glad opengl32)
+
+
+# Step 1: Define the source and destination directories
+set(SHADER_SOURCE_DIR "${CMAKE_SOURCE_DIR}/shaders")
+set(SHADER_DEST_DIR "${CMAKE_BINARY_DIR}/Release/shaders")
+
+# Step 2: Add a custom command to copy shaders
+add_custom_command(
+    OUTPUT ${SHADER_DEST_DIR}  # Make sure to create the destination directory
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADER_DEST_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${SHADER_SOURCE_DIR} ${SHADER_DEST_DIR}
+    DEPENDS ${SHADER_SOURCE_DIR}  # Only run when the source directory changes
+    COMMENT "Copying shaders from ${SHADER_SOURCE_DIR} to ${SHADER_DEST_DIR}"
+)
+
+# Step 3: Add a custom target that depends on the above custom command
+add_custom_target(copy_shaders ALL
+    DEPENDS ${SHADER_DEST_DIR}
+)
+
+# Ensure that the copy_shaders target is built before your main build
+add_dependencies(VoxelRaymarcher copy_shaders)
