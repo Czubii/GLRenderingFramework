@@ -9,6 +9,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+
 # Add GLFW
 add_subdirectory(external/GLFW)
 include_directories(external/GLFW/include)
@@ -16,6 +18,9 @@ include_directories(external/GLFW/include)
 # Add GLAD
 include_directories(external/glad/include)
 add_library(glad external/glad/src/glad.c)
+
+#Add stb
+include_directories(external/stb/include)
 
 # Include directories for your headers
 include_directories(include)
