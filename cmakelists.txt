@@ -20,7 +20,7 @@ include_directories(external/glad/include)
 add_library(glad external/glad/src/glad.c)
 
 #Add stb
-include_directories(external/stb/include)
+include_directories(external/glm/)
 
 # Include directories for your headers
 include_directories(include)

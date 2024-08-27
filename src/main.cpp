@@ -7,6 +7,9 @@
 #include <shaderClass.h>
 #include <stb_image.h>
 #include <texture.h>
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
 
 inline float pulsatingFloat(){
 	return (sin(glfwGetTime())+2) / 5;
@@ -89,6 +92,7 @@ int main()
 
 	Texture cuteCatUwU("texture.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	cuteCatUwU.texUnit(shaderProgram, "tex0", 0);
+
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
