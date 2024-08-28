@@ -2,47 +2,33 @@
 #include "camera.h"
 #include "iostream"
 
-Mesh::Mesh() {
-}
+Mesh::Mesh() = default;
 
 Mesh::Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices,
-           const std::vector<Texture> &_textures)
+           const GLubyte _color[4])
     : vertices(_vertices),
-      indices(_indices),
-      textures(_textures) {
+      indices(_indices) {
+    color[0] = _color[0];
+    color[1] = _color[1];
+    color[2] = _color[2];
+    color[3] = _color[3];
     VAO.Bind();
 
     VBO VBO(vertices);
     EBO EBO(indices);
 
     //modify the bellow lines if I ever change the Vertex struct
-    VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, 8 * sizeof(float), (void *) 0);
-    VAO.LinkAttrib(VBO, 1, 3, GL_FLOAT, 8 * sizeof(float), (void *) (3 * sizeof(float)));
-    VAO.LinkAttrib(VBO, 2, 2, GL_FLOAT, 8 * sizeof(float), (void *) (6 * sizeof(float)));
+    VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, 3 * sizeof(float), nullptr);
 
     VAO.Unbind();
     VBO.Unbind();
     EBO.Unbind();
 }
 
-Mesh::Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices, const Texture &_texture)
-    : Mesh(_vertices, _indices, std::vector<Texture>{_texture}) {}
-
-Mesh::Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices)
-    : Mesh(_vertices, _indices, std::vector<Texture>()) {}
-
-
-void Mesh::draw(Shader &shader, const Camera &camera, const DrawMode mode, const Transform &transform)
-//TODO: add the multiple textures functionality
-{
+void Mesh::draw(Shader &shader, const Camera &camera, const DrawMode mode, const Transform &transform) {
     shader.Activate();
     VAO.Bind();
     setVertexShaderUniforms(shader, camera, transform);
-
-    if (!textures.empty()) {//TODO: add default texture
-        textures[0].texUnit(shader, "tex0", 0);
-        textures[0].Bind();
-    }
 
     switch (mode) {
         default:
@@ -73,7 +59,7 @@ void Mesh::drawInstanced(Shader &shader, const Camera &camera, const GLsizei num
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-inline void Mesh::setVertexShaderUniforms(Shader &shader, const Camera &camera, const Transform &transform) {
+inline void Mesh::setVertexShaderUniforms(Shader &shader, const Camera &camera, const Transform &transform) const {
     camera.applyMatrix(shader, "cameraMatrix");
 
     auto translation = glm::mat4(1.0f);
@@ -83,12 +69,16 @@ inline void Mesh::setVertexShaderUniforms(Shader &shader, const Camera &camera, 
     glm::mat4 rotation = glm::toMat4(transform.rot);
     scale = glm::scale(scale, transform.scale);
 
-    GLuint translationUni = glGetUniformLocation(shader.ID, "translation");
+    const GLint translationUni = glGetUniformLocation(shader.ID, "translation");
     glUniformMatrix4fv(translationUni, 1, GL_FALSE, glm::value_ptr(translation));
 
-    GLuint rotationUni = glGetUniformLocation(shader.ID, "rotation");
+    const GLint rotationUni = glGetUniformLocation(shader.ID, "rotation");
     glUniformMatrix4fv(rotationUni, 1, GL_FALSE, glm::value_ptr(rotation));
 
-    GLuint scaleUni = glGetUniformLocation(shader.ID, "scale");
+    const GLint scaleUni = glGetUniformLocation(shader.ID, "scale");
     glUniformMatrix4fv(scaleUni, 1, GL_FALSE, glm::value_ptr(scale));
+
+    const auto colorF = glm::vec4(color[0] / 255.0f, color[1] / 255.0f, color[2] / 255.0f, color[3] / 255.0f);
+    const GLint colorUni = glGetUniformLocation(shader.ID, "objectColor");
+    glUniform4fv(colorUni, 4, glm::value_ptr(colorF));
 }

@@ -3,8 +3,8 @@
 
 #include <vector>
 #include "VBO.h"
-#include "texture.h"
 #include "VAO.h"
+#include "shaderClass.h"
 #include "EBO.h"
 #include "objectTransform.h"
 #include <gtc/matrix_transform.hpp>
@@ -24,19 +24,18 @@ class Mesh{
     public:
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
-    std::vector<Texture> textures;
+    GLubyte color[4] = {100, 100, 100, 255};//TODO: replace with a material class
 
     VAO VAO;
     Mesh();
-    Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices, const std::vector<Texture> &_textures);
-    Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices, const Texture& _texture);
+    Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices, const GLubyte _color[4]);
     Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices);
 
     void draw(Shader& shader, const Camera& camera, DrawMode mode = DrawMode::DEFAULT, const Transform& transform = Transform());
     void drawInstanced(Shader& shader, const Camera& camera, GLsizei numInstances, DrawMode mode = DrawMode::DEFAULT);
 
     private:
-    static inline void setVertexShaderUniforms(Shader& shader, const Camera& camera, const Transform& transform = Transform());
+    inline void setVertexShaderUniforms(Shader& shader, const Camera& camera, const Transform& transform = Transform()) const;
 };
 
 #endif

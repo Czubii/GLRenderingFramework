@@ -4,7 +4,7 @@ VBO::VBO() {
     glGenBuffers(1, &ID);
 }
 
-VBO::VBO(std::vector<Vertex> &vertices)
+VBO::VBO(const std::vector<Vertex> &vertices)
 {
 
     // Generate the VBO, with only 1 object
@@ -12,7 +12,7 @@ VBO::VBO(std::vector<Vertex> &vertices)
     // Bind the VBO specifying it's a GL_ARRAY_BUFFER
 	glBindBuffer(GL_ARRAY_BUFFER, ID);
 	// Introduce the vertices into the VBO
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);//TODO: GL_STATIC_DRAW - look into this for future self
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

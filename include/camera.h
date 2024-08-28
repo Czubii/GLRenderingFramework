@@ -9,42 +9,8 @@
 #include "objectTransform.h"
 #include "shaderClass.h"
 #include "mesh.h"
-#include "texture.h"
 
-const Vertex viewMeshVertices[] = 
-	{                   //   COORDINATES    /               /      COLORS      /             / TexCoord //
-		Vertex{glm::vec3(-0.5f, -0.5f,  0.0f),     glm::vec3(0.83f, 0.70f, 0.44f),	glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(0.5f, -0.5f,  0.0f),     glm::vec3(0.83f, 0.70f, 0.44f),	glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(0.5f, 0.5f,  0.0f),     glm::vec3(0.83f, 0.70f, 0.44f),	glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(-0.5f, 0.5f,  0.0f),     glm::vec3(0.83f, 0.70f, 0.44f),	glm::vec2(0.0f, 0.0f)},
-
-    	Vertex{glm::vec3(-0.5f, 0.5f,  -0.5f),     glm::vec3(0.83f, 0.70f, 0.44f),	glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(0.5f, 0.5f,  -0.5f),     glm::vec3(0.83f, 0.70f, 0.44f),	glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(0.5f, 0.5f,  0.5f),     glm::vec3(0.83f, 0.70f, 0.44f),	glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(-0.5f, 0.5f,  0.5f),     glm::vec3(0.83f, 0.70f, 0.44f),	glm::vec2(0.0f, 0.0f)}
-	};
-
-// const GLuint viewMeshIndices[] = {
-//     0, 1, 2,
-//     2, 3, 0,
-//     0, 3, 7,
-//     7, 4, 0,
-//     0, 1, 5,
-//     5, 4, 0,
-//     1, 2, 6,
-//     6, 5, 1,
-//     2, 6, 7,
-//     7, 3, 2,
-//     4, 5, 6,
-//     6, 7, 4
-
-// };
-const GLuint viewMeshIndices[] = {
-    0, 1, 2,
-    2, 3, 0,
-};
-
-
+/// @brief Camera class
 class Camera
 { 
 
@@ -79,17 +45,12 @@ class Camera
         ///@brief sends vertex transformation matrix to uniform
         void applyMatrix(Shader& shader, const char* uniform) const;
 
-        void drawViewBounds(Shader& shader, const Camera& camera);
-
         /// @brief sets new camera dimensions
-        void setDimensions(const unsigned int & _width, const unsigned int & _height);
+        void setDimensions(const int & _width, const int & _height);
 
     private:
         ///@brief matrix containig vertex transformations - perspective and transformation
         glm::mat4 m_matrix = glm::mat4(1.0f);
-        glm::mat4 m_viewBoundsMeshTransformMatrix = glm::mat4(1.0f);//TODO
-        Mesh m_viewBoundsMesh;
-        void updateViewBoundsMesh();
 };
 
 

@@ -5,10 +5,7 @@
 #include <VBO.h>
 #include <EBO.h>
 #include <shaderClass.h>
-#include <stb_image.h>
-#include <texture.h>
 #include <glm.hpp>
-#include <map_chunk.h>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 #include "camera.h"
@@ -70,57 +67,18 @@ int main()
 	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
 	glViewport(0, 0, windowWidth, windowHeight);
 
-	// Vertices coordinates
-	std::vector<Vertex> vertices;
-	float vertArr[] =
-		{//     COORDINATES     /        COLORS      /   TexCoord  //
-		 -2.5f, 0.0f, 0.5f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f,
-		 -0.5f, 0.0f, -0.5f, 0.83f, 0.70f, 0.44f, 5.0f, 0.0f,
-		 0.5f, 0.0f, -0.5f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f,
-		 0.5f, 0.0f, 0.5f, 0.83f, 0.70f, 0.44f, 5.0f, 0.0f,
-		 0.0f, 0.75f, 0.0f, 0.92f, 0.86f, 0.76f, 2.5f, 5.0f};
-
-	for (int i = 0; i < 5; i++)
-	{
-		int idx = i * 8;
-		glm::vec3 a = glm::vec3(vertArr[idx], vertArr[idx + 1], vertArr[idx + 2]);
-		glm::vec3 b = glm::vec3(vertArr[idx + 3], vertArr[idx + 4], vertArr[idx + 5]);
-		glm::vec2 c = glm::vec2(static_cast<GLuint>(vertArr[idx + 6]), static_cast<GLuint>(vertArr[idx + 7]));
-		Vertex vert = {a, b, c};
-		vertices.push_back(vert);
-	}
-
-	// Indices for vertices order
-	std::vector<GLuint> indices =
-		{
-			0, 1, 2,
-			0, 2, 3,
-			0, 1, 4,
-			1, 2, 4,
-			2, 3, 4,
-			3, 0, 4};
-
-	// Texture brickTexture("brick.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE); 
-	Texture brickTexture(255, 255, 255, 25);
-
-	Mesh piramid(vertices, indices, std::vector<Texture>{brickTexture});
 
 	std::vector<Vertex> cubeVertices(cube::vertices, cube::vertices + sizeof(cube::vertices) / sizeof(Vertex));
 	std::vector<GLuint> cubeIndices(cube::indices, cube::indices + sizeof(cube::indices) / sizeof(GLuint));
 
-	Mesh cube(cubeVertices, cubeIndices, std::vector<Texture>{brickTexture});
-	Mesh cube2(cubeVertices, cubeIndices, std::vector<Texture>{brickTexture});
+	GLubyte color[4] = {255, 255, 255, 255};
+	Mesh cube(cubeVertices, cubeIndices, color);
+
 	Shader shaderProgram("shaders/default.vert", "shaders/default.frag");
 
-	Chunk testChunk;
+	auto camera = Camera(windowWidth, windowHeight);
+	CameraOperator camOperator(&camera);
 
-	cameras = {
-	Camera(windowWidth, windowHeight),
-	Camera(windowWidth, windowHeight)};
-
-	CameraOperator camOperator(&cameras[0]);
-	int cameraIdx = 0;
-	bool cameraSwitched = false;
 
 	glEnable(GL_DEPTH_TEST); // this is so the vertices that should be in the front are drawn on vertices that should be in the back
 
@@ -134,25 +92,6 @@ int main()
 		timeDelta = currentTime - previousTime;
 		previousTime = currentTime;
 
-		if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
-		{
-			if (!cameraSwitched)
-			{
-				cameraSwitched = true;
-
-				cameraIdx++;
-
-				if (cameraIdx >= cameras.size())
-					cameraIdx = 0;
-
-				camOperator.setCamera(&cameras[cameraIdx]);
-			}
-		}
-		else
-		{
-			cameraSwitched = false;
-		}
-
 		camOperator.handleInputs(window, timeDelta);
 		camOperator.getCamera().updateMatrix();
 
@@ -163,14 +102,7 @@ int main()
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
 
-		auto test = Transform();
-		test.pos.x = 1.0f;
-		test.rot = glm::quat(glm::vec3(0.0f, 1.0f, 0.0f));
-		// piramid.draw(shaderProgram, camOperator.getCamera());
-		// cube.draw(shaderProgram, camOperator.getCamera());
-		// cube2.draw(shaderProgram, camOperator.getCamera(), DrawMode::DEFAULT, test);
-		testChunk.draw(shaderProgram, camOperator.getCamera());
-		cameras[0].drawViewBounds(shaderProgram, camOperator.getCamera());
+		cube.draw(shaderProgram, camera);
 
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
@@ -179,7 +111,6 @@ int main()
 	}
 
 	// Delete all the objects we've created
-	brickTexture.Delete();
 	shaderProgram.Delete();
 
 	// Delete window before ending the program

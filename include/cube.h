@@ -8,15 +8,15 @@ namespace cube{
 
 const Vertex vertices[] = 
 	{                   //   COORDINATES    /               /      COLORS      /             / TexCoord //
-		Vertex{glm::vec3(-0.5f, -0.5f,  -0.5f),     glm::vec3(0.83f, 0.70f, 0.44f),	glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(0.5f, -0.5f,  -0.5f),     glm::vec3(0.83f, 0.70f, 0.44f),	glm::vec2(1.0f, 0.0f)},
-        Vertex{glm::vec3(0.5f, -0.5f,  0.5f),     glm::vec3(0.83f, 0.70f, 0.44f),	glm::vec2(1.0f, 1.0f)},
-        Vertex{glm::vec3(-0.5f, -0.5f,  0.5f),     glm::vec3(0.83f, 0.70f, 0.44f),	glm::vec2(0.0f, 1.0f)},
+		Vertex{glm::vec3(-0.5f, -0.5f,  -0.5f)},
+        Vertex{glm::vec3(0.5f, -0.5f,  -0.5f)},
+        Vertex{glm::vec3(0.5f, -0.5f,  0.5f)},
+        Vertex{glm::vec3(-0.5f, -0.5f,  0.5f)},
 
-    	Vertex{glm::vec3(-0.5f, 0.5f,  -0.5f),     glm::vec3(0.83f, 0.70f, 0.44f),	glm::vec2(1.0f, 1.0f)},
-        Vertex{glm::vec3(0.5f, 0.5f,  -0.5f),     glm::vec3(0.83f, 0.70f, 0.44f),	glm::vec2(0.0f, 1.0f)},
-        Vertex{glm::vec3(0.5f, 0.5f,  0.5f),     glm::vec3(0.83f, 0.70f, 0.44f),	glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(-0.5f, 0.5f,  0.5f),     glm::vec3(0.83f, 0.70f, 0.44f),	glm::vec2(1.0f, 0.0f)},
+    	Vertex{glm::vec3(-0.5f, 0.5f,  -0.5f)},
+        Vertex{glm::vec3(0.5f, 0.5f,  -0.5f)},
+        Vertex{glm::vec3(0.5f, 0.5f,  0.5f)},
+        Vertex{glm::vec3(-0.5f, 0.5f,  0.5f)}
 	};
 
 #endif
