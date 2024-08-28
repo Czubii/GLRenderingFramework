@@ -2,6 +2,7 @@
 #define EBO_CLASS
 
 #include <glad/glad.h>
+#include <vector>
 class EBO
 {
 public:
@@ -11,7 +12,7 @@ public:
     /// @brief element buffer object - Stores indices that define the order of vertex rendering, allowing reuse of vertex data.
     /// @param indices indices to store
     /// @param size size of indice array
-    EBO(GLuint* indices, GLsizeiptr size);
+    EBO(std::vector<GLuint>& indices);
 
     /// @brief Bind this EBO
     void Bind();

@@ -10,6 +10,8 @@
 #include <gtx/rotate_vector.hpp>
 #include <gtx/vector_angle.hpp>
 
+#define OPERATOR_SPEED 0.8f
+#define OPERATOR_SPEED_SHIFT_KEY 2.5f
 
 class CameraOperator
 {
@@ -18,7 +20,7 @@ private:
     bool m_firstClick = true;
 
 public:
-    float speed = 0.1f;
+    float speed = 0.4f;
     float sensitivity = 100.0f;
 
     CameraOperator(Camera *_camera);

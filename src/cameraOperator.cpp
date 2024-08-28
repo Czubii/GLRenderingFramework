@@ -34,11 +34,11 @@ void CameraOperator::handleInputs(GLFWwindow *window, const float timeDelta)
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
-		speed = 0.4f;
+		speed = OPERATOR_SPEED_SHIFT_KEY;
 	}
 	else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
 	{
-		speed = 0.1f;
+		speed = OPERATOR_SPEED;
 	}
 
 		// Handles mouse inputs

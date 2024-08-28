@@ -13,8 +13,8 @@
 #include "camera.h"
 #include "objectTransform.h"
 #include "cameraOperator.h"
-
-
+#include "mesh.h"
+#include "cube.h"
 int main()
 {
 	// Initialize GLFW
@@ -47,17 +47,27 @@ int main()
 	glViewport(0, 0, 800, 800);
 
 	// Vertices coordinates
-	GLfloat vertices[] =
+	std::vector<Vertex> vertices;
+	float vertArr[]=
 	{ //     COORDINATES     /        COLORS      /   TexCoord  //
-		-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+		-2.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
 		-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
 		0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
 		0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
-		0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	2.5f, 5.0f
+		0.0f, 0.75f,  0.0f,     0.92f, 0.86f, 0.76f,	2.5f, 5.0f
 	};
 
+	for(int i = 0; i<5; i++){
+		int idx = i * 8;
+		glm::vec3 a = glm::vec3(vertArr[idx],vertArr[idx+1], vertArr[idx+2]);
+		glm::vec3 b = glm::vec3(vertArr[idx+3],vertArr[idx+4], vertArr[idx+5]);
+		glm::vec2 c = glm::vec2(static_cast<GLuint>(vertArr[idx+6]), static_cast<GLuint>(vertArr[idx+7]));
+		Vertex vert = {a, b, c};
+		vertices.push_back(vert);
+	}
+
 	// Indices for vertices order
-	GLuint indices[] =
+	std::vector<GLuint> indices =
 	{
 		0, 1, 2,
 		0, 2, 3,
@@ -67,27 +77,19 @@ int main()
 		3, 0, 4
 	};
 
+	Texture brickTexture("brick.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	
+
+	Mesh piramid(vertices, indices, std::vector<Texture>{brickTexture});
+
+
+	std::vector<Vertex> cubeVertices(cube::vertices, cube::vertices + sizeof(cube::vertices) / sizeof(Vertex));
+	std::vector<GLuint> cubeIndices(cube::indices, cube::indices + sizeof(cube::indices) / sizeof(GLuint));
+
+	Mesh cube(cubeVertices, cubeIndices, std::vector<Texture>{brickTexture});
+
 	Shader shaderProgram("shaders/default.vert", "shaders/default.frag");
 
-	VAO VAO1;
-	VAO1.Bind();
-
-	VBO VBO1(vertices, sizeof(vertices));
-	EBO EBO1(indices, sizeof(indices));
-
-	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 8 * sizeof(float), (void *)0);
-	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-	VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-
-	VAO1.Unbind();
-	VBO1.Unbind();
-	EBO1.Unbind();
-
-	// Retrieve the location of the "scale" uniform variable in the shader program.
-	// This location is used to set or query the value of the uniform in the shader.
-
-	Texture brickTexture("brick.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-	brickTexture.texUnit(shaderProgram, "tex0", 0);
 
 	Transform cameraTransform;
 	cameraTransform.rot = glm::vec3(0.0f ,0.0f, 0.2f);
@@ -135,6 +137,7 @@ int main()
 
 		camOperator.handleInputs(window, timeDelta);
 
+
 		// Specify the color of the background
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// Clean the back buffer and assign the new color to it
@@ -145,14 +148,9 @@ int main()
 
 
 		camOperator.getCamera().updateMatrix(shaderProgram, "cameraMatrix");
+		// piramid.draw(shaderProgram, camOperator.getCamera());
+		cube.drawWireframe(shaderProgram, camOperator.getCamera());
 
-		brickTexture.Bind();
-		// Set the value of the "scale" uniform variable in the shader program
-		// This updates the shader with the new scale factor for rendering.
-		// Bind the VAO so OpenGL knows to use it
-		VAO1.Bind();
-		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Take care of all GLFW events
@@ -160,9 +158,6 @@ int main()
 	}
 
 	// Delete all the objects we've created
-	VAO1.Delete();
-	VBO1.Delete();
-	EBO1.Delete();
 	brickTexture.Delete();
 	shaderProgram.Delete();
 
