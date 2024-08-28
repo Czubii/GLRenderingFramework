@@ -10,10 +10,9 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
+#include "camera.h"
+#include "objectTransform.h"
 
-inline float pulsatingFloat(){
-	return (sin(glfwGetTime())+2) / 5;
-}
 
 int main()
 {
@@ -48,20 +47,24 @@ int main()
 
 	// Vertices coordinates
 	GLfloat vertices[] =
-		{
-			//   COORDINATES   /  	/     COLORS     / /  texture coord 	//
-			-0.5f, 	-0.5f, 0.0f, 	1.0f, 0.0f, 0.0f,	   0.0f, 1.0f,	// Upper left 	corner
-			0.5f, 	-0.5f, 0.0f, 	0.0f, 1.0f, 0.0f,	   1.0f, 1.0f,	// Upper right 	corner
-			0.5f, 	 0.5f, 0.0f, 	1.0f, 0.0f, 1.0f,	   1.0f, 0.0f,	// Lower right 	corner
-			-0.5f,   0.5f, 0.0f, 	1.0f, 1.0f, 1.0f, 	   0.0f, 0.0f 	// Lower left 	corner
-		};
+	{ //     COORDINATES     /        COLORS      /   TexCoord  //
+		-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+		-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
+		0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+		0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
+		0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	2.5f, 5.0f
+	};
 
 	// Indices for vertices order
 	GLuint indices[] =
-		{
-			0, 1, 2, // Lower left triangle
-			2, 3, 0 // Upper right triangle
-		};
+	{
+		0, 1, 2,
+		0, 2, 3,
+		0, 1, 4,
+		1, 2, 4,
+		2, 3, 4,
+		3, 0, 4
+	};
 
 	Shader shaderProgram("shaders/default.vert", "shaders/default.frag");
 
@@ -81,38 +84,39 @@ int main()
 
 	// Retrieve the location of the "scale" uniform variable in the shader program.
 	// This location is used to set or query the value of the uniform in the shader.
-	GLuint UniID = glGetUniformLocation(shaderProgram._ID, "scale");
 
-	GLfloat scale = 0.0f;
+	Texture brickTexture("brick.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	brickTexture.texUnit(shaderProgram, "tex0", 0);
 
+	Transform cameraTransform;
+	cameraTransform.rot = glm::vec3(0.0f ,0.0f, 0.2f);
+	cameraTransform.pos.z = -2.0f;
+	Camera cam(800, 800, cameraTransform);
 
-	int imgWidth, imgHeight, numColChanells;
-	stbi_set_flip_vertically_on_load(true);
-	unsigned char* imgBytes = stbi_load("texture.png", &imgWidth, &imgHeight, &numColChanells, 0);
-
-	Texture cuteCatUwU("texture.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-	cuteCatUwU.texUnit(shaderProgram, "tex0", 0);
-
-
+	glEnable(GL_DEPTH_TEST);// this is so the vertices that should be in the front are drawn on vertices that should be in the back
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
-		scale += 0.00001f;
+		cameraTransform.rot.z += 0.00002;
 
 		// Specify the color of the background
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// Clean the back buffer and assign the new color to it
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
-		cuteCatUwU.Bind();
+
+
+
+		cam.updateMatrix(shaderProgram, "cameraMatrix");
+
+		brickTexture.Bind();
 		// Set the value of the "scale" uniform variable in the shader program
 		// This updates the shader with the new scale factor for rendering.
-		glUniform1f(UniID, pulsatingFloat());
 		// Bind the VAO so OpenGL knows to use it
 		VAO1.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Take care of all GLFW events
@@ -123,7 +127,7 @@ int main()
 	VAO1.Delete();
 	VBO1.Delete();
 	EBO1.Delete();
-	cuteCatUwU.Delete();
+	brickTexture.Delete();
 	shaderProgram.Delete();
 
 	// Delete window before ending the program

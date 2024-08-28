@@ -3,32 +3,32 @@
 
 Texture::Texture(const char *imageSrc, GLenum texType, GLenum slot, GLenum format, GLenum pixelType)
 {
-    _type = texType;
+    type = texType;
 
     int imgWidth, imgHeight, numColChanells;
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char* imgBytes = stbi_load(imageSrc, &imgWidth, &imgHeight, &numColChanells, 0);
 
-    glGenTextures(1, &_ID);
+    glGenTextures(1, &ID);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(_type, _ID);
+    glBindTexture(type, ID);
     
-	glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(type, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(type, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	glTexParameteri(_type, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(_type, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(type, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(type, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	glTexImage2D(_type, 0, GL_RGBA, imgWidth, imgHeight, 0, format, pixelType, imgBytes);
-	glGenerateMipmap(_type);
+	glTexImage2D(type, 0, GL_RGBA, imgWidth, imgHeight, 0, format, pixelType, imgBytes);
+	glGenerateMipmap(type);
 
 	stbi_image_free(imgBytes);
-	glBindTexture(_type, 0);
+	glBindTexture(type, 0);
 }
 
 void Texture::texUnit(Shader &shader, const char *uniform, GLuint unit)
 {
-    GLuint texUniID = glGetUniformLocation(shader._ID, uniform);
+    GLuint texUniID = glGetUniformLocation(shader.ID, uniform);
 	shader.Activate();
 
 	glUniform1i(texUniID, unit);
@@ -36,15 +36,15 @@ void Texture::texUnit(Shader &shader, const char *uniform, GLuint unit)
 
 void Texture::Bind()
 {
-    glBindTexture(_type, _ID);
+    glBindTexture(type, ID);
 }
 
 void Texture::Unbind()
 {
-    glBindTexture(_type, 0);
+    glBindTexture(type, 0);
 }
 
 void Texture::Delete()
 {
-    glDeleteTextures(1, &_ID);
+    glDeleteTextures(1, &ID);
 }

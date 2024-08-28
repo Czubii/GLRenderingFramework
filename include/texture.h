@@ -7,8 +7,8 @@
 class Texture{
 
 public: 
-    GLuint _ID;
-    GLenum _type;
+    GLuint ID;
+    GLenum type;
 
 
     /**

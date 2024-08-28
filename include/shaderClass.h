@@ -19,7 +19,7 @@ class Shader
 {
 public:
 	/// Reference ID of the Shader Program
-	GLuint _ID;
+	GLuint ID;
 	
 	/// @brief Constructor that build the Shader Program from 2 different shaders
 	/// @param vertexFile path to vertex shader
