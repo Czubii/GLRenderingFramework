@@ -9,7 +9,7 @@ class VAO
 
 public:
     /// @brief VAO's opengl ID
-    GLuint _ID;
+    GLuint ID = 0;
     VAO();
 
     void VAO::LinkAttrib(VBO &VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset);

@@ -7,7 +7,7 @@ class EBO
 {
 public:
     /// @brief EBO's opengl ID
-    GLuint _ID;
+    GLuint ID = 0;
 
     /// @brief element buffer object - Stores indices that define the order of vertex rendering, allowing reuse of vertex data.
     /// @param indices indices to store

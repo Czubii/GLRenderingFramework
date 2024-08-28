@@ -5,7 +5,7 @@
 VAO::VAO()
 {
     // Generate the VAO, with only 1 object
-    glGenVertexArrays(1, &_ID);
+    glGenVertexArrays(1, &ID);
 }
 
 void VAO::LinkAttrib(VBO &VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset)
@@ -22,7 +22,7 @@ void VAO::LinkAttrib(VBO &VBO, GLuint layout, GLuint numComponents, GLenum type,
 
 void VAO::Bind()
 {
-    glBindVertexArray(_ID);
+    glBindVertexArray(ID);
 }
 
 void VAO::Unbind()
@@ -32,5 +32,5 @@ void VAO::Unbind()
 
 void VAO::Delete()
 {
-    glDeleteVertexArrays(1, &_ID);
+    glDeleteVertexArrays(1, &ID);
 }

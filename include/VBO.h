@@ -17,7 +17,7 @@ class VBO
 {
 public:
     /// @brief VBO's opengl ID
-    GLuint _ID;
+    GLuint ID = 0;
 
     /// @brief vertex buffer object - stores vertex data in GPU
     /// @param vertices vertices to store
