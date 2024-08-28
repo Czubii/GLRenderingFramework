@@ -10,13 +10,12 @@
 
 
 class Camera
-{
-    private:
-
-        glm::vec3 m_up = glm::vec3(0.0f, 1.0f, 0.0f);
+{ 
 
     public:
-        Transform & transform;
+        glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+        Transform transform;
 
         /// @brief field of view in radians
         float fovDEG = 80.0f;
@@ -34,7 +33,7 @@ class Camera
         /// @param _width projection width
         /// @param _height projection height
         /// @param _transform camera position as reference
-        Camera(int _width, int _height, Transform & _transform);
+        Camera(int _width, int _height, Transform _transform);
 
 
         void updateMatrix(Shader & shader, const char* uniform);

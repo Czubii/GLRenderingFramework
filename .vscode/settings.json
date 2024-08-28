@@ -1,7 +1,10 @@
 {
     "files.associations": {
         "iostream": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "vector": "cpp",
+        "algorithm": "cpp",
+        "xiosbase": "cpp"
     },
     "todo-tree.tree.scanMode": "workspace"
 }

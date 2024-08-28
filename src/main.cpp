@@ -12,6 +12,7 @@
 #include <gtc/type_ptr.hpp>
 #include "camera.h"
 #include "objectTransform.h"
+#include "cameraOperator.h"
 
 
 int main()
@@ -91,13 +92,48 @@ int main()
 	Transform cameraTransform;
 	cameraTransform.rot = glm::vec3(0.0f ,0.0f, 0.2f);
 	cameraTransform.pos.z = -2.0f;
-	Camera cam(800, 800, cameraTransform);
+
+	std::vector<Camera> cameras = {
+	Camera(800, 800, cameraTransform),
+	Camera(800, 800, cameraTransform),
+	Camera(800, 800, cameraTransform),
+	};
+
+	CameraOperator camOperator(&cameras[0]);
+	int cameraIdx = 0;
+	bool cameraSwitched = false;
 
 	glEnable(GL_DEPTH_TEST);// this is so the vertices that should be in the front are drawn on vertices that should be in the back
+
+	float previousTime = static_cast<float>(glfwGetTime());
+	float timeDelta, currentTime;
+
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
-	{
-		cameraTransform.rot.z += 0.00002;
+	{	currentTime = static_cast<float>(glfwGetTime());
+        timeDelta = currentTime - previousTime;
+        previousTime = currentTime;
+
+		if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
+		{
+			if(!cameraSwitched){
+				cameraSwitched = true;
+
+				cameraIdx++;
+
+				if (cameraIdx >= cameras.size())
+					cameraIdx = 0;
+
+				camOperator.setCamera(&cameras[cameraIdx]);
+				
+			}
+		}
+		else{
+			cameraSwitched = false;
+		}
+
+
+		camOperator.handleInputs(window, timeDelta);
 
 		// Specify the color of the background
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
@@ -108,7 +144,7 @@ int main()
 
 
 
-		cam.updateMatrix(shaderProgram, "cameraMatrix");
+		camOperator.getCamera().updateMatrix(shaderProgram, "cameraMatrix");
 
 		brickTexture.Bind();
 		// Set the value of the "scale" uniform variable in the shader program
