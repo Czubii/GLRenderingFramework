@@ -3,6 +3,7 @@
 
 #include <glad/glad.h>
 #include "shaderClass.h"
+#include "glm.hpp"
 
 class Texture{
 
@@ -21,6 +22,16 @@ public:
     * @param pixelType Pixel data type (e.g., GL_UNSIGNED_BYTE).
     */
     Texture(const char* imageSrc, GLenum texType, GLenum slot, GLenum format, GLenum pixelType);
+
+    /// @brief creates 1x1 texture with a specified RGB / RGBA color
+    /// @param R red
+    /// @param G green
+    /// @param B blue
+    /// @param A alpha
+    Texture(const unsigned char &R,
+			const unsigned char &G,
+			const unsigned char &B,
+			const unsigned char &A = 255);
 
     /**
     * @brief Assigns the texture to a shader uniform.
@@ -46,6 +57,8 @@ public:
     * @brief Deletes the texture.
     */
     void Delete();
+
+    private:
 
 };
 

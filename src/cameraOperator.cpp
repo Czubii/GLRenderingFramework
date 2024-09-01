@@ -1,28 +1,28 @@
 #include "cameraOperator.h"
-
+#include <iostream>
 CameraOperator::CameraOperator(Camera *_camera) : m_camera(_camera) {}
 
 void CameraOperator::handleInputs(GLFWwindow *window, const float timeDelta)
 {
-
+	
 	Camera &camera = *m_camera;
 
 	// Handles key inputs
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		camera.transform.pos += timeDelta * speed * camera.transform.rot;
+		camera.transform.pos += timeDelta * speed * camera.orientation;
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		camera.transform.pos += timeDelta * speed * -glm::normalize(glm::cross(camera.transform.rot, camera.up));
+		camera.transform.pos += timeDelta * speed * -glm::normalize(glm::cross(camera.orientation, camera.up));
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		camera.transform.pos += timeDelta * speed * -camera.transform.rot;
+		camera.transform.pos += timeDelta * speed * -camera.orientation;
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		camera.transform.pos += timeDelta * speed * glm::normalize(glm::cross(camera.transform.rot, camera.up));
+		camera.transform.pos += timeDelta * speed * glm::normalize(glm::cross(camera.orientation, camera.up));
 	}
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
@@ -42,7 +42,7 @@ void CameraOperator::handleInputs(GLFWwindow *window, const float timeDelta)
 	}
 
 		// Handles mouse inputs
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)//TODO: make this use
 	{
 		// Hides mouse cursor
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -66,16 +66,18 @@ void CameraOperator::handleInputs(GLFWwindow *window, const float timeDelta)
 		float rotY = sensitivity * (float)(mouseX - (camera.width / 2)) / camera.width;
 
 		// Calculates upcoming vertical change in the Orientation
-		glm::vec3 newOrientation = glm::rotate(camera.transform.rot, glm::radians(-rotX), glm::normalize(glm::cross(camera.transform.rot, camera.up)));
+		glm::vec3 newOrientation = glm::rotate(camera.orientation, glm::radians(-rotX), glm::normalize(glm::cross(camera.orientation, camera.up)));
 
 		// Decides whether or not the next vertical Orientation is legal or not
 		if (abs(glm::angle(newOrientation, camera.up) - glm::radians(90.0f)) <= glm::radians(85.0f))
 		{
-			camera.transform.rot = newOrientation;
+			camera.orientation = newOrientation;
 		}
 
 		// Rotates the Orientation left and right
-		camera.transform.rot = glm::rotate(camera.transform.rot, glm::radians(-rotY), camera.up);
+		camera.orientation = glm::rotate(camera.orientation, glm::radians(-rotY), camera.up);
+
+		camera.transform.rot = glm::rotation(glm::vec3(0.0f, 0.0f, 1.0f), camera.orientation);//FIXME: wrong rotation when camera moves horizontally - left <-> Right
 
 		// Sets mouse cursor to the middle of the screen so that it doesn't end up roaming around
 		glfwSetCursorPos(window, (camera.width / 2), (camera.height / 2));

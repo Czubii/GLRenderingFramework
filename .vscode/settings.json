@@ -61,5 +61,5 @@
         "xtr1common": "cpp",
         "xutility": "cpp"
     },
-    "todo-tree.tree.scanMode": "workspace"
+    "todo-tree.tree.scanMode": "workspace only"
 }
