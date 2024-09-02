@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(VoxelRaymarcher)
+project(GLRenderingFramework)
 
 # Ensure compile_commands.json is generated
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -27,15 +27,15 @@ include_directories(include)
 
 # Define the executable
 file(GLOB SOURCES src/*.cpp)
-add_executable(VoxelRaymarcher ${SOURCES})
+add_executable(GLRenderingFramework ${SOURCES})
 
 # Link libraries
-target_link_libraries(VoxelRaymarcher glfw glad opengl32)
+target_link_libraries(GLRenderingFramework glfw glad opengl32)
 
 
 # Step 1: Define the source and destination directories
 set(SHADER_SOURCE_DIR "${CMAKE_SOURCE_DIR}/shaders")
-set(SHADER_DEST_DIR "${CMAKE_BINARY_DIR}/Release/shaders")
+set(SHADER_DEST_DIR "${CMAKE_BINARY_DIR}/shaders")
 
 # Step 2: Add a custom command to copy shaders
 add_custom_command(
@@ -52,4 +52,4 @@ add_custom_target(copy_shaders ALL
 )
 
 # Ensure that the copy_shaders target is built before your main build
-add_dependencies(VoxelRaymarcher copy_shaders)
+add_dependencies(GLRenderingFramework copy_shaders)

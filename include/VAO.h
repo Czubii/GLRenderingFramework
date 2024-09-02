@@ -14,7 +14,6 @@ public:
 
     void VAO::LinkAttrib(VBO &VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset);
 
-
     /// @brief Bind this VAO
     void Bind();
 

@@ -28,7 +28,7 @@ void Camera::applyMatrix(Shader &shader, const char *uniform) const
 }
 void Camera::drawViewBounds(Shader &shader, const Camera &camera) 
 {
-    m_viewBoundsMesh.drawContour(shader, camera, transform);
+    m_viewBoundsMesh.draw(shader, camera, DrawMode::LINES, transform);
 }
 void Camera::setDimensions(const unsigned int &_width, const unsigned int &_height) //FIXME: currentl resizing camera also changes fov. make the render dimensions static and apply some matrix 
 {

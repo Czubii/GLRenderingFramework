@@ -19,16 +19,22 @@ public:
     /// @brief VBO's opengl ID
     GLuint ID = 0;
 
+    VBO();
+
     /// @brief vertex buffer object - stores vertex data in GPU
     /// @param vertices vertices to store
     /// @param size size of vertice array
     VBO(std::vector<Vertex>& vertices);
 
+    VBO(const std::vector<glm::mat4> &transformations);
+
+    void updateData(const void* newData, GLuint size) const;
+
     /// @brief Bind this VBO
-    void Bind();
+    void Bind() const;
 
     /// @brief Unbind the current VBO
-    void Unbind();
+    void Unbind() const;
 
     /// @brief Delete this VBO from gpu memory
     void Delete();

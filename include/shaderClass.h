@@ -34,7 +34,7 @@ public:
 private:
 
 	/// @brief Prints eventual shader compile errors to console
-	void compileErrors(unsigned int shader, const char* type);
+	static void compileErrors(unsigned int shader, const char* type);
 };
 
 #endif

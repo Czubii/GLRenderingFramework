@@ -2,90 +2,82 @@
 #include "camera.h"
 #include "iostream"
 
-Mesh::Mesh(){}
+Mesh::Mesh() {
+}
 
-Mesh::Mesh(std::vector<Vertex> &_vertices, std::vector<GLuint> &_indices, std::vector<Texture> &_textures)
+Mesh::Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices,
+           const std::vector<Texture> &_textures)
     : vertices(_vertices),
       indices(_indices),
-      textures(_textures)
-{
+      textures(_textures) {
     VAO.Bind();
 
     VBO VBO(vertices);
     EBO EBO(indices);
 
     //modify the bellow lines if I ever change the Vertex struct
-    VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, 8 * sizeof(float), (void *)0);
-	VAO.LinkAttrib(VBO, 1, 3, GL_FLOAT, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-	VAO.LinkAttrib(VBO, 2, 2, GL_FLOAT, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+    VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, 8 * sizeof(float), (void *) 0);
+    VAO.LinkAttrib(VBO, 1, 3, GL_FLOAT, 8 * sizeof(float), (void *) (3 * sizeof(float)));
+    VAO.LinkAttrib(VBO, 2, 2, GL_FLOAT, 8 * sizeof(float), (void *) (6 * sizeof(float)));
 
     VAO.Unbind();
-	VBO.Unbind();
-	EBO.Unbind();
+    VBO.Unbind();
+    EBO.Unbind();
 }
 
-Mesh::Mesh(std::vector<Vertex> &_vertices, std::vector<GLuint> &_indices, Texture &_texture)
-:Mesh(_vertices, _indices, std::vector<Texture>{_texture}){}
-Mesh::Mesh(std::vector<Vertex> &_vertices, std::vector<GLuint> &_indices)
-:Mesh(_vertices, _indices, std::vector<Texture>()){}
+Mesh::Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices, const Texture &_texture)
+    : Mesh(_vertices, _indices, std::vector<Texture>{_texture}) {}
+
+Mesh::Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices)
+    : Mesh(_vertices, _indices, std::vector<Texture>()) {}
 
 
-void Mesh::draw(Shader& shader, const Camera& camera, const Transform& transform)//TODO: add the multiple textures functionality
+void Mesh::draw(Shader &shader, const Camera &camera, const DrawMode mode, const Transform &transform)
+//TODO: add the multiple textures functionality
 {
-	shader.Activate();
-	VAO.Bind();
-    
+    shader.Activate();
+    VAO.Bind();
     setVertexShaderUniforms(shader, camera, transform);
 
-    if(textures.size() > 0){
+    if (!textures.empty()) {//TODO: add default texture
         textures[0].texUnit(shader, "tex0", 0);
         textures[0].Bind();
     }
-	// Draw the actual mesh
-	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
 
+    switch (mode) {
+        default:
+            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
 
-    
+        case (DrawMode::WIREFRAME):
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+        case(DrawMode::LINES):
+            glEnable(GL_LINE_SMOOTH);
+            glLineWidth(2.0f);
+            glDrawElements(GL_LINE_LOOP, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
+            glDisable(GL_LINE_SMOOTH);
+    }
 }
 
-void Mesh::drawWireframe(Shader& shader, const Camera& camera, const Transform& transform)//TODO: consider adding model matrix as parameter
-{
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+void Mesh::drawInstanced(Shader &shader, const Camera &camera, const GLsizei numInstances, DrawMode mode) {
     shader.Activate();
-	VAO.Bind();
+    VAO.Bind();
+    setVertexShaderUniforms(shader, camera);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0, numInstances);
 
-    setVertexShaderUniforms(shader, camera, transform);
-
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
+    GL_CHECK_ERROR();
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-void Mesh::drawContour(Shader &shader, const Camera &camera, const Transform &transform)
-{
-    glEnable(GL_LINE_SMOOTH);
-    glLineWidth(2.0f);
-    shader.Activate();
-	VAO.Bind();
-
-    setVertexShaderUniforms(shader, camera, transform);
-
-    if(textures.size() > 0){
-        textures[0].texUnit(shader, "tex0", 0);
-        textures[0].Bind();
-    }
-
-    glDrawElements(GL_LINE_LOOP, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
-    glDisable(GL_LINE_SMOOTH);
-}
-
-inline void Mesh::setVertexShaderUniforms(Shader &shader, const Camera &camera, const Transform &transform)
-{
+inline void Mesh::setVertexShaderUniforms(Shader &shader, const Camera &camera, const Transform &transform) {
     camera.applyMatrix(shader, "cameraMatrix");
 
-    glm::mat4 translation = glm::mat4(1.0f);
-    glm::mat4 scale = glm::mat4(1.0f);
+    auto translation = glm::mat4(1.0f);
+    auto scale = glm::mat4(1.0f);
 
     translation = glm::translate(translation, transform.pos);
     glm::mat4 rotation = glm::toMat4(transform.rot);

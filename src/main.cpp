@@ -8,6 +8,7 @@
 #include <stb_image.h>
 #include <texture.h>
 #include <glm.hpp>
+#include <map_chunk.h>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 #include "camera.h"
@@ -111,6 +112,8 @@ int main()
 	Mesh cube2(cubeVertices, cubeIndices, std::vector<Texture>{brickTexture});
 	Shader shaderProgram("shaders/default.vert", "shaders/default.frag");
 
+	Chunk testChunk;
+
 	cameras = {
 	Camera(windowWidth, windowHeight),
 	Camera(windowWidth, windowHeight)};
@@ -160,12 +163,13 @@ int main()
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
 
-		Transform test = Transform();
+		auto test = Transform();
 		test.pos.x = 1.0f;
 		test.rot = glm::quat(glm::vec3(0.0f, 1.0f, 0.0f));
 		// piramid.draw(shaderProgram, camOperator.getCamera());
-		cube.draw(shaderProgram, camOperator.getCamera());
-		cube2.drawWireframe(shaderProgram, camOperator.getCamera(), test);
+		// cube.draw(shaderProgram, camOperator.getCamera());
+		// cube2.draw(shaderProgram, camOperator.getCamera(), DrawMode::DEFAULT, test);
+		testChunk.draw(shaderProgram, camOperator.getCamera());
 		cameras[0].drawViewBounds(shaderProgram, camOperator.getCamera());
 
 		// Swap the back buffer with the front buffer

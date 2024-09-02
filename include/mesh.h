@@ -9,8 +9,16 @@
 #include "objectTransform.h"
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
+#include <debug.h>
 
 class Camera;
+
+enum class DrawMode {
+    DEFAULT,
+    WIREFRAME,
+    LINES
+};
+
 class Mesh{
 
     public:
@@ -19,21 +27,16 @@ class Mesh{
     std::vector<Texture> textures;
 
     VAO VAO;
-
     Mesh();
-    Mesh(std::vector<Vertex> &_vertices, std::vector<GLuint> &_indices, std::vector<Texture> &_textures);
-    Mesh(std::vector<Vertex> &_vertices, std::vector<GLuint> &_indices, Texture& _texture);
-    Mesh(std::vector<Vertex> &_vertices, std::vector<GLuint> &_indices);
+    Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices, const std::vector<Texture> &_textures);
+    Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices, const Texture& _texture);
+    Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices);
 
-    void draw(Shader& shader, const Camera& camera, const Transform& transform = Transform());
-
-    void drawWireframe(Shader& shader, const Camera& camera, const Transform& transform = Transform());
-    
-    /// @note won't work well if mesh isn't created specifically for this use case
-    void drawContour(Shader& shader, const Camera& camera, const Transform& transform = Transform());
+    void draw(Shader& shader, const Camera& camera, DrawMode mode = DrawMode::DEFAULT, const Transform& transform = Transform());
+    void drawInstanced(Shader& shader, const Camera& camera, GLsizei numInstances, DrawMode mode = DrawMode::DEFAULT);
 
     private:
-    inline void setVertexShaderUniforms(Shader& shader, const Camera& camera, const Transform& transform);
+    static inline void setVertexShaderUniforms(Shader& shader, const Camera& camera, const Transform& transform = Transform());
 };
 
 #endif

@@ -44,7 +44,7 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile)
 	// Compile the Vertex Shader into machine code
 	glCompileShader(fragmentShader);
 	// Check for errors during compilation
-	compileErrors(fragmentShader, "FRAMGENT");
+	compileErrors(fragmentShader, "FRAGMENT");
 
 	// Create Shader Program Object and get its reference
 	ID = glCreateProgram();
@@ -76,7 +76,7 @@ void Shader::Delete()
 }
 
 
-void Shader::compileErrors(unsigned int shader, const char* type)
+void Shader::compileErrors(const unsigned int shader, const char* type)
 {
 	// Stores status of compilation
 	GLint hasCompiled;
