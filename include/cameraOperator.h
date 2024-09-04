@@ -11,11 +11,10 @@
 #include <gtx/vector_angle.hpp>
 #include <gtx/quaternion.hpp>
 
-#define OPERATOR_SPEED 0.8f
-#define OPERATOR_SPEED_SHIFT_KEY 2.5f
+#define OPERATOR_SPEED 14.0f
+#define OPERATOR_SPEED_SHIFT_KEY 30.0f
 
-class CameraOperator
-{
+class CameraOperator {
 private:
     Camera *m_camera;
     bool m_firstClick = true;
@@ -29,6 +28,7 @@ public:
     void handleInputs(GLFWwindow *window, const float timeDelta);
 
     void setCamera(Camera *_camera);
+
     Camera &getCamera();
 };
 

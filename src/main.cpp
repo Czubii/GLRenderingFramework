@@ -14,6 +14,7 @@
 #include "mesh.h"
 #include "cube.h"
 #include <gtx/quaternion.hpp>
+#include "obj_load.h"
 
 static GLuint windowWidth = 820;
 static GLuint windowHeight = 640;
@@ -21,20 +22,19 @@ static GLuint windowHeight = 640;
 static std::vector<Camera> cameras;
 
 /// @brief called when window size changes, updates viewport and cameras
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    std::cout << "Window resized: " << width << "x" << height << std::endl;
+void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+	std::cout << "Window resized: " << width << "x" << height << std::endl;
 
 	windowWidth = width;
 	windowHeight = height;
 
-    // update the viewport to match the new window dimensions
-    glViewport(0, 0, windowWidth, windowHeight);
-	for(auto & camera: cameras)
+	// update the viewport to match the new window dimensions
+	glViewport(0, 0, windowWidth, windowHeight);
+	for (auto &camera: cameras)
 		camera.setDimensions(windowWidth, windowHeight);
 }
 
-int main()
-{
+int main() {
 	// Initialize GLFW
 	glfwInit();
 
@@ -49,8 +49,7 @@ int main()
 	// Create a GLFWwindow object of 800 by 800 pixels, naming it "YoutubeOpenGL"
 	GLFWwindow *window = glfwCreateWindow(windowWidth, windowHeight, "YoutubeOpenGL", NULL, NULL);
 	// Error check if the window fails to create
-	if (window == NULL)
-	{
+	if (window == NULL) {
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
 		return -1;
@@ -71,23 +70,21 @@ int main()
 	std::vector<Vertex> cubeVertices(cube::vertices, cube::vertices + sizeof(cube::vertices) / sizeof(Vertex));
 	std::vector<GLuint> cubeIndices(cube::indices, cube::indices + sizeof(cube::indices) / sizeof(GLuint));
 
-	GLubyte color[4] = {255, 255, 255, 255};
-	Mesh cube(cubeVertices, cubeIndices, color);
 
 	Shader shaderProgram("shaders/default.vert", "shaders/default.frag");
 
 	auto camera = Camera(windowWidth, windowHeight);
 	CameraOperator camOperator(&camera);
+	std::vector<Mesh> meshes = meshesFromFile("cube.obj");
 
-
-	glEnable(GL_DEPTH_TEST); // this is so the vertices that should be in the front are drawn on vertices that should be in the back
+	glEnable(GL_DEPTH_TEST);
+	// this is so the vertices that should be in the front are drawn on vertices that should be in the back
 
 	float previousTime = static_cast<float>(glfwGetTime());
 	float timeDelta, currentTime;
 
 	// Main while loop
-	while (!glfwWindowShouldClose(window))
-	{
+	while (!glfwWindowShouldClose(window)) {
 		currentTime = static_cast<float>(glfwGetTime());
 		timeDelta = currentTime - previousTime;
 		previousTime = currentTime;
@@ -102,7 +99,10 @@ int main()
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
 
-		cube.draw(shaderProgram, camera);
+		for (auto &mesh: meshes) {
+			mesh.draw(shaderProgram, camera, DrawMode::DEFAULT);
+		}
+
 
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);

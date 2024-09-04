@@ -5,13 +5,11 @@
 Mesh::Mesh() = default;
 
 Mesh::Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices,
-           const GLubyte _color[4])
+           const glm::vec3 &_color, const char *_name)
     : vertices(_vertices),
-      indices(_indices) {
-    color[0] = _color[0];
-    color[1] = _color[1];
-    color[2] = _color[2];
-    color[3] = _color[3];
+      indices(_indices),
+      name(_name),
+      color(_color) {
     VAO.Bind();
 
     VBO VBO(vertices);
@@ -33,17 +31,20 @@ void Mesh::draw(Shader &shader, const Camera &camera, const DrawMode mode, const
     switch (mode) {
         default:
             glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
+            break;
 
         case (DrawMode::WIREFRAME):
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            break;
 
         case(DrawMode::LINES):
             glEnable(GL_LINE_SMOOTH);
             glLineWidth(2.0f);
             glDrawElements(GL_LINE_LOOP, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
             glDisable(GL_LINE_SMOOTH);
+            break;
     }
 }
 
@@ -78,7 +79,6 @@ inline void Mesh::setVertexShaderUniforms(Shader &shader, const Camera &camera, 
     const GLint scaleUni = glGetUniformLocation(shader.ID, "scale");
     glUniformMatrix4fv(scaleUni, 1, GL_FALSE, glm::value_ptr(scale));
 
-    const auto colorF = glm::vec4(color[0] / 255.0f, color[1] / 255.0f, color[2] / 255.0f, color[3] / 255.0f);
     const GLint colorUni = glGetUniformLocation(shader.ID, "objectColor");
-    glUniform4fv(colorUni, 4, glm::value_ptr(colorF));
+    glUniform3fv(colorUni, 1, glm::value_ptr(color));
 }

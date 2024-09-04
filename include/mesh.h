@@ -24,12 +24,12 @@ class Mesh{
     public:
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
-    GLubyte color[4] = {100, 100, 100, 255};//TODO: replace with a material class
+    glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);//TODO: replace with a material class
+    std::string name;
 
     VAO VAO;
     Mesh();
-    Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices, const GLubyte _color[4]);
-    Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices);
+    Mesh(const std::vector<Vertex> &_vertices, const std::vector<GLuint> &_indices, const glm::vec3& _color, const char* _name = "unnamedMesh");
 
     void draw(Shader& shader, const Camera& camera, DrawMode mode = DrawMode::DEFAULT, const Transform& transform = Transform());
     void drawInstanced(Shader& shader, const Camera& camera, GLsizei numInstances, DrawMode mode = DrawMode::DEFAULT);
