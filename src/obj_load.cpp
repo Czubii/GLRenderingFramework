@@ -1,7 +1,6 @@
 #include "obj_load.h"
 
 struct Material {
-    std::string name;
     glm::vec3 color;
 };
 
@@ -25,10 +24,10 @@ inline std::vector<std::string> splitString(const std::string &str, const char s
     return tokens;
 }
 
-inline std::vector<Material> loadMaterials(const char *mtlPath) {
+inline std::unordered_map<std::string, Material> loadMaterials(const char *mtlPath) {
     std::ifstream mtlFile(mtlPath);
 
-    std::vector<Material> materials;
+    std::unordered_map<std::string, Material> materialMap;
     bool skipCreatingMaterial = true;
 
     std::string matName;
@@ -45,8 +44,7 @@ inline std::vector<Material> loadMaterials(const char *mtlPath) {
 
         if (lineSubstrings[0] == "newmtl") {
             if (!skipCreatingMaterial) {
-                Material material = {matName, matColor};
-                materials.push_back(material);
+                materialMap[matName] = {matColor};
 
                 matName.clear();
                 matColor = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -59,35 +57,23 @@ inline std::vector<Material> loadMaterials(const char *mtlPath) {
                                  std::stof(lineSubstrings[3]));
         }
     }
-    Material material = {matName, matColor};
-    materials.push_back(material);
+    materialMap[matName] = {matColor};
 
-    return materials;
+    return materialMap;
 }
 
-Material getMaterial(const std::string &name, const std::vector<Material> &materials) {
-    for (auto &material: materials) {
-        if (material.name == name) {
-            return material;
-        }
-    }
-    return Material{};
-}
-
-std::vector<Mesh> meshesFromFile(const char *objPath) {
+Mesh meshFromFile(const char *objPath) {
+    //TODO: Move to mesh class as constructor
     std::ifstream objFile(objPath);
 
-    std::vector<Mesh> meshes;
-
     std::string meshName;
+    std::vector<glm::vec3> v;
+    std::vector<glm::vec3> vn;
     std::vector<Vertex> meshVertices;
-    std::vector<GLuint> meshIndices;
-    bool skipMeshCreation = true;
-
-    int indicesDelta = 1;
 
     std::vector<Material> materials;
     std::unordered_map<std::string, Material> materialMap;
+    Material *currentMaterial;
 
     std::string line;
     while (std::getline(objFile, line)) {
@@ -99,35 +85,20 @@ std::vector<Mesh> meshesFromFile(const char *objPath) {
         std::vector<std::string> lineSubstrings = splitString(line);
 
         if (lineSubstrings[0] == "mtllib") {
-            std::vector<Material> loadedMaterials = loadMaterials(lineSubstrings[1].c_str());
-            for (auto &material: loadedMaterials) {
-                materials.push_back(material);
-            }
-        }
-
-        if (lineSubstrings[0] == "g") {
-            if (!skipMeshCreation) {
-                Material material = materialMap[meshName];
-                glm::vec3 color = material.color;
-
-                meshes.emplace_back(meshVertices, meshIndices, color, meshName.c_str());
-
-                indicesDelta += static_cast<int>(meshVertices.size());
-
-                meshName.clear();
-                meshVertices.clear();
-                meshIndices.clear();
-            }
-            meshName = splitString(lineSubstrings[1], ':')[0];
-            skipMeshCreation = false;
+            materialMap = loadMaterials(lineSubstrings[1].c_str());
         }
 
         if (lineSubstrings[0] == "usemtl") {
-            materialMap[meshName] = getMaterial(lineSubstrings[1], materials);
+            currentMaterial = &materialMap[lineSubstrings[1]];
         }
 
         if (lineSubstrings[0] == "v") {
-            meshVertices.push_back({
+            v.push_back({
+                glm::vec3(std::stof(lineSubstrings[1]), std::stof(lineSubstrings[2]), std::stof(lineSubstrings[3]))
+            });
+        }
+        if (lineSubstrings[0] == "vn") {
+            vn.push_back({
                 glm::vec3(std::stof(lineSubstrings[1]), std::stof(lineSubstrings[2]), std::stof(lineSubstrings[3]))
             });
         }
@@ -135,13 +106,13 @@ std::vector<Mesh> meshesFromFile(const char *objPath) {
         if (lineSubstrings[0] == "f") {
             for (int i = 1; i < 4; i++) {
                 std::vector<std::string> vertexIndices = splitString(lineSubstrings[i], '/');
-                meshIndices.push_back(std::stoi(vertexIndices[0]) - indicesDelta);
+                meshVertices.push_back({
+                    v[std::stoi(vertexIndices[0]) - 1], vn[std::stoi(vertexIndices[2]) - 1], currentMaterial->color
+                });
             }
         }
     }
 
-    Material material = materialMap[meshName];
-    meshes.emplace_back(meshVertices, meshIndices, material.color, meshName.c_str());
 
-    return meshes;
+    return {meshVertices, meshName.c_str()};
 }

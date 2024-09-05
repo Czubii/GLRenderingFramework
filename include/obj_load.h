@@ -9,6 +9,6 @@
 #include <iostream>
 
 /// @brief Load a mesh from an obj file and its corresponding mtl file
-std::vector<Mesh> meshesFromFile(const char *objPath);
+Mesh meshFromFile(const char *objPath);
 
 #endif //OBJ_LOAD_H

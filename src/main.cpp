@@ -75,7 +75,7 @@ int main() {
 
 	auto camera = Camera(windowWidth, windowHeight);
 	CameraOperator camOperator(&camera);
-	std::vector<Mesh> meshes = meshesFromFile("cube.obj");
+	Mesh testMesh = meshFromFile("test.obj");
 
 	glEnable(GL_DEPTH_TEST);
 	// this is so the vertices that should be in the front are drawn on vertices that should be in the back
@@ -99,9 +99,7 @@ int main() {
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
 
-		for (auto &mesh: meshes) {
-			mesh.draw(shaderProgram, camera, DrawMode::DEFAULT);
-		}
+		testMesh.draw(shaderProgram, camera, DrawMode::WIREFRAME);
 
 
 		// Swap the back buffer with the front buffer
