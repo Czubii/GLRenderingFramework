@@ -37,6 +37,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 int main() {
 	// Initialize GLFW
 	glfwInit();
+	glfwWindowHint(GLFW_SAMPLES, 4); // Set 4x multisampling (you can adjust the value to your needs)
 
 	// Tell GLFW what version of OpenGL we are using
 	// In this case we are using OpenGL 3.3
@@ -62,6 +63,8 @@ int main() {
 
 	// Load GLAD so it configures OpenGL
 	gladLoadGL();
+	glEnable(GL_MULTISAMPLE);
+
 	// Specify the viewport of OpenGL in the Window
 	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
 	glViewport(0, 0, windowWidth, windowHeight);
@@ -99,7 +102,7 @@ int main() {
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
 
-		testMesh.draw(shaderProgram, camera, DrawMode::WIREFRAME);
+		testMesh.draw(shaderProgram, camera, DrawMode::DEFAULT);
 
 
 		// Swap the back buffer with the front buffer

@@ -4,6 +4,7 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec3 aColor;
 
 out vec3 color;
+out vec3 fragNormal;
 
 uniform mat4 cameraMatrix;
 uniform mat4 model;
@@ -14,5 +15,6 @@ uniform mat4 scale;
 void main()
 {
     color = aColor;
+    fragNormal = aNormal;
     gl_Position = cameraMatrix * translation * rotation * scale * vec4(aPos, 1.0);
 }
